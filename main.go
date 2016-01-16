@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -10,7 +12,11 @@ import (
 	"text/template"
 )
 
-var configDir = os.ExpandEnv("${HOME}/.ssh/config-template")
+var (
+	sshDir     = os.ExpandEnv("${HOME}/.ssh")
+	configFile = path.Join(sshDir, "config")
+	configDir  = path.Join(sshDir, "config-template")
+)
 
 func main() {
 	log.SetFlags(0)
@@ -24,15 +30,23 @@ func main() {
 		log.Fatalf("unable to read directory names: %v\n", err)
 	}
 	sort.Strings(names)
+	b := bytes.NewBuffer(nil)
+	b.WriteString(`# THIS FILE WAS GENERATED AUTOMATICALLY USING ssh-config-template
+
+`)
 	for _, name := range names {
 		hosts, err := loadHosts(name)
 		if err != nil {
 			log.Fatalf("error loading hosts for %s: %v\n", name, err)
 		}
-		err = execute(name, hosts, os.Stdout)
+		err = execute(name, hosts, b)
 		if err != nil {
 			log.Fatalf("error executing template for %s: %v\n", name, err)
 		}
+	}
+	err = ioutil.WriteFile(configFile, b.Bytes(), 0600)
+	if err != nil {
+		log.Fatalf("error writing to %s: %v\n", configFile, err)
 	}
 }
 
