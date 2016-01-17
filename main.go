@@ -1,4 +1,4 @@
-package main
+package main // import "luit.eu/ssh-config-template"
 
 import (
 	"bytes"
