@@ -2,6 +2,11 @@
 
 A tool I use to manage my `~/.ssh/config`
 
+## CAUTION
+
+Use this at your own risk. This _WILL_ overwrite `~/.ssh/config` no questions
+asked.
+
 ## Installation
 
 Get [Go], and `go get luit.eu/ssh-config-template`.
