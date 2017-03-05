@@ -1,4 +1,4 @@
-package main // import "luit.eu/ssh-config-template"
+package main // import "loe.yt/sct"
 
 import (
 	"bytes"
@@ -13,9 +13,9 @@ import (
 )
 
 var (
-	sshDir     = os.ExpandEnv("${HOME}/.ssh")
-	configFile = path.Join(sshDir, "config")
-	configDir  = path.Join(sshDir, "config-template")
+	homeDir    = os.Getenv("HOME")
+	configFile = path.Join(homeDir, ".ssh", "config")
+	configDir  = path.Join(homeDir, ".sct")
 )
 
 func main() {
@@ -31,9 +31,7 @@ func main() {
 	}
 	sort.Strings(names)
 	b := bytes.NewBuffer(nil)
-	b.WriteString(`# THIS FILE WAS GENERATED AUTOMATICALLY USING ssh-config-template
-
-`)
+	b.WriteString("# THIS FILE WAS GENERATED AUTOMATICALLY USING loe.yt/sct\n\n")
 	for _, name := range names {
 		hosts, err := loadHosts(name)
 		if err != nil {

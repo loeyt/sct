@@ -1,4 +1,4 @@
-# ssh-config-template
+# sct -- SSH config templating
 
 A tool I use to manage my `~/.ssh/config`
 
@@ -9,11 +9,11 @@ asked.
 
 ## Installation
 
-Get [Go], and `go get luit.eu/ssh-config-template`.
+Get [Go], and `go get loe.yt/sct`.
 
 ## Use
 
-`ssh-config-template` looks at all folders in `~/.ssh/config-template/`. In
+`ssh-config-template` looks at all folders in `~/.sct/`. In
 those folders it expects to find a `template` file, and a `hosts.json` file.
 The `template` file must be a valid [text/template]. The hosts.json must be a
 valid JSON Object, and each value in the Object will be passed to the template
