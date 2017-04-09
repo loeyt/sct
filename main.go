@@ -18,6 +18,8 @@ var (
 	configDir  = path.Join(homeDir, ".sct")
 )
 
+const marker = "# THIS FILE WAS GENERATED AUTOMATICALLY USING loe.yt/sct\n\n"
+
 func main() {
 	log.SetFlags(0)
 	dir, err := os.Open(configDir)
@@ -31,7 +33,7 @@ func main() {
 	}
 	sort.Strings(names)
 	b := bytes.NewBuffer(nil)
-	b.WriteString("# THIS FILE WAS GENERATED AUTOMATICALLY USING loe.yt/sct\n\n")
+	b.WriteString(marker)
 	for _, name := range names {
 		hosts, err := loadHosts(name)
 		if err != nil {
@@ -48,57 +50,37 @@ func main() {
 	}
 }
 
-type Host struct {
+type host struct {
 	Name  string
 	Value interface{}
 }
 
-type Hosts []Host
-
-func (hs *Hosts) UnmarshalJSON(data []byte) error {
-	var v map[string]interface{}
-	err := json.Unmarshal(data, &v)
-	if err != nil {
-		return err
-	}
-	for name, value := range v {
-		*hs = append(*hs, Host{Name: name, Value: value})
-	}
-	sort.Sort(*hs)
-	return nil
-}
-
-func (hs Hosts) Len() int {
-	return len(hs)
-}
-
-func (hs Hosts) Less(i, j int) bool {
-	return hs[i].Name < hs[j].Name
-}
-
-func (hs Hosts) Swap(i, j int) {
-	hs[i], hs[j] = hs[j], hs[i]
-}
-
-func loadHosts(name string) (Hosts, error) {
-	var v Hosts
+func loadHosts(name string) ([]host, error) {
 	file, err := os.Open(path.Join(configDir, name, "hosts.json"))
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
 	d := json.NewDecoder(file)
+	var v map[string]interface{}
 	if err := d.Decode(&v); err != nil {
 		return nil, err
 	}
-	return v, nil
+	l := make([]host, 0)
+	for name, value := range v {
+		l = append(l, host{Name: name, Value: value})
+	}
+	sort.Slice(l, func(i, j int) bool {
+		return l[i].Name < l[j].Name
+	})
+	return l, nil
 }
 
 const mainTemplate = `{{range .}}{{template "template" .}}{{end}}`
 
 var mainTpl = template.Must(template.New("main").Parse(mainTemplate))
 
-func execute(name string, hosts Hosts, w io.Writer) error {
+func execute(name string, hosts []host, w io.Writer) error {
 	tpl, err := mainTpl.Clone()
 	if err != nil {
 		return err

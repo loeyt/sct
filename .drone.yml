@@ -1,0 +1,18 @@
+workspace:
+  base: /go
+  path: src/loe.yt/sct
+
+pipeline:
+
+  build:
+    image: golang:1.8
+    commands:
+      - go install -v loe.yt/sct
+
+  release:
+    image: plugins/github-release
+    files:
+      - /go/bin/sct
+    checksum: [sha256]
+    when:
+      event: tag
