@@ -1,0 +1,14 @@
+groups: []
+resources:
+- name: sct
+  type: git
+  source:
+    uri: https://github.com/loeyt/sct
+resource_types: []
+jobs:
+- name: build
+  plan:
+  - get: sct
+    trigger: true
+  - task: build
+    file: sct/ci/tasks/build.yml
